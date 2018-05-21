@@ -1,0 +1,162 @@
+在很多数据结构的面试题中看似简单，但是对题目的要求却挺高，主要就体现在复杂度分析方面。复杂度又分为时间复杂度和空间复杂度。
+
+1.时间复杂度
+
+时间复杂度实际就是函数，函数计算执行的基本操作次数 .
+
+在进行时间复杂度分析时需注意: 
+
+1)时间复杂度强调的是函数执行的操作次数，这里的函数是指数学里面的函数，而不是C语法里的函数；
+
+2)在实际中我们通常情况考量的是算法的最坏情况；
+
+3)忽略掉常数；
+4) 关注运行时间的增长趋势，关注函数式中增长最快的表达式,忽略系数;
+    (比如：F(n)=10*n^3+50n+1000,其时间复杂度为O(n)=n^3)
+5)递归算法的时间复杂度计算：递归总次数*每次递归次数.
+
+2.空间复杂度
+空间复杂度，它是对一个算法在运行过程中临时占用存储空间大小的量度。所以它强调的是使用的辅助空间的的大小，而不是指所有的数据所占用的空间。
+
+要注意的是递归算法的空间复杂度，假如递归深度为N*每次递归的辅助空间大小，如果每次递归的辅助空间为常数，则空间复杂度为O(N)。
+ 
+
+下面通过斐波那契数列对时间，空间复杂度进行分析一下：
+
+1.
+
+[cpp] view plain copy
+long long* fib(long long n)  
+{  
+    assert(n>=0);  
+    long long* ptr=new long long[n+1];  
+    ptr[0]=0;  
+    ptr[1]=1;  
+    for(int i=2;i<=n;++i)  
+    {  
+        ptr[i]=ptr[i-1]+ptr[i-2];  
+    }  
+    return ptr;  
+}  
+对于这种算法，函数真正执行次数为n-1,所以忽略常数后，时间复杂度为O(n);
+因为开辟了n+1个空间，有n+1个辅助空间，所以空间复杂度为O(n).
+2.
+
+[cpp] view plain copy
+long long fib(long long n)  
+{  
+    assert(n>=0);  
+    long long first=0;  
+    long long second=1;  
+    long long ret=0;  
+        for(int i=2;i<=n;i++)  
+    {  
+        ret=first+second;  
+        first=second;  
+        second=ret;  
+    }  
+    return ret;  
+}  
+这是非递归的另一种算法，函数真正执行次数依然为n-1,所以忽略常数后，时间复杂度还是O(n);
+
+由于采用变量交换的方式，所以在这里辅助空间个数为一个常数，空间复杂度为O(1).
+
+3.再看一下递归算法
+
+[cpp] view plain copy
+#include<assert.h>  
+#include<iostream>  
+using namespace std;  
+long long fib(long long n)  
+{  
+    assert(n>=0);  
+    return (n<2)?(n):(fib(n-1)+fib(n-2));  
+}  
+int main()  
+{  
+        long long value=fib(15);  
+    cout<< value <<endl;  
+    system("pause");  
+    return 0;  
+}  
+递归算法的时间复杂度计算方法是:递归总次数*每次递归次数；
+递归算法的时间复杂度计算方法是：递归深度*每次递归所需的辅助空间个数.
+
+最早斐波那契研究该数列时，为了描述清楚就以兔子生长情况为例：
+
+.第一个月有一对刚诞生的兔子；
+
+.第二个月后可生育；
+
+.每月每对可生育的兔子会诞生下一对新兔子；
+
+.假设兔子永不死去。
+
+
+
+
+
+由上图可以得出斐波那契递归算法时间复杂度：O（2^N），空间复杂度为:O(N)
+
+
+
+
+
+下面再看一个有关二分查找的的例子：
+
+1.递归情况
+
+[cpp] view plain copy
+int BinarySearch2(const int* ptr,const int x,const int left,const int right)  
+{  
+    int mid=(left+right)/2;  
+    while(left<=right)  
+    {  
+        if(x<ptr[mid])  
+        {  
+            return BinarySearch2(ptr,x,left,mid-1);  
+        }  
+        else if(x>ptr[mid])  
+        {  
+            return BinarySearch2(ptr,x,mid+1,right);  
+        }  
+        return mid;  
+    }  
+}  
+
+
+
+1)假设以最坏情况考虑，二分查找第一次在n/2中查找(n为元素个数)；第二次在一半的一半中查找，即n/2/2=n/4;……第x次在n/2^x范围内查找，即2^x=n(x=log2^n),所以时间复杂度为O(log2^n).
+
+2)递归情况下的空间复杂度：递归深度为N*每次递归的辅助空间大小，如果每次递归的辅助空间为常数，则空间复杂度为O(N)。
+对于递归的二分查找，递归深度是log2^n，每次递归的辅助空间为常数，所以空间复杂度为O(log2^N)
+2.非递归情况
+
+[cpp] view plain copy
+int BinarySearch1(const int* ptr,const int x,const int len)  
+{  
+    int left=0;  
+    int right=len-1;  
+    int mid=(left+right)/2;  
+    while(left<=right)  
+    {  
+        if(x<ptr[mid])  
+        {  
+            right=mid-1;  
+        }  
+        else if(x>ptr[mid])  
+        {  
+            left=mid+1;  
+        }  
+        else  
+        {  
+            return mid;  
+        }  
+    }  
+    return -1;  
+}  
+
+
+对于非递归的二分查找与递归查找的时间复杂度一样的分析方法,所以时间复杂度为O(log2^n)；
+
+但是在这个过程中，辅助空间为常数级别，所以空间复杂度为O(1)
